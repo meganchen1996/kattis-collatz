@@ -1,0 +1,9 @@
+.DS_Store
+Collatz.plist
+RunCollatz.plist
+collatztestgen.py
+doxygen_sqlite3.db
+findcollatzoverflow.py
+latex/
+overflow
+run.sh

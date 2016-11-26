@@ -1,0 +1,83 @@
+commit 2588242c0c61ab74cd3abf3a56104619a4666ca3
+Author: Megan Chen <meganchen@utexas.edu>
+Date:   Fri Sep 9 00:38:31 2016 -0500
+
+    auto generated acceptance tests and clang format
+
+commit 3c3def72bb65195afa26918fd9adc8657d39d648
+Author: Megan Chen <meganchen@utexas.edu>
+Date:   Thu Sep 8 23:31:35 2016 -0500
+
+    commented and cleaned up code
+
+commit d4b9be7fc5b53f26b4873b95787000114a2c37a5
+Author: Megan Chen <meganchen@utexas.edu>
+Date:   Thu Sep 8 23:25:03 2016 -0500
+
+    small optimization
+
+commit 0b1a35cb8e10375a0e00e54363e66545423f3a31
+Author: Megan Chen <meganchen@utexas.edu>
+Date:   Thu Sep 8 23:16:30 2016 -0500
+
+    wrote unit tests, close #5, #8, #14
+
+commit 1fbd1d2fca93346b42efb307dd7e1f4da1b182b8
+Author: Megan Chen <meganchen@utexas.edu>
+Date:   Thu Sep 8 22:26:26 2016 -0500
+
+    lazy cache with a huge array, close #7
+
+commit 08a8aff123ebc1902b681e6c34e7f7385876c1a1
+Author: Megan Chen <meganchen@utexas.edu>
+Date:   Thu Sep 8 17:33:44 2016 -0500
+
+    separated out optimized and unoptimized code with ifdef
+
+commit 001682ce2649e48a0bbdf8660818338d89a52e78
+Author: Megan Chen <meganchen@utexas.edu>
+Date:   Thu Sep 8 15:43:55 2016 -0500
+
+    got rid of comment
+
+commit 6cff9e0aa23d40324f62eb1b808217c7cb29ac3d
+Author: Megan Chen <meganchen@utexas.edu>
+Date:   Thu Sep 8 15:34:20 2016 -0500
+
+    Naive solution, close #4
+
+commit 779ff1173f6a0b529df04d842f7fe4c3d7adc7bb
+Author: Megan Chen <meganchen@utexas.edu>
+Date:   Sat Sep 3 16:10:00 2016 -0500
+
+    added skeleton code
+
+commit 31e6c819d800c75ab07455cdbc94706499ea8a86
+Author: Megan Chen <meganchen@utexas.edu>
+Date:   Sat Sep 3 16:02:55 2016 -0500
+
+    renamed .travis.yaml --> .travis.yml
+
+commit 0c61b195a1d1ca376e549ce4a104fe939484b833
+Author: Megan Chen <meganchen@utexas.edu>
+Date:   Sat Sep 3 16:01:46 2016 -0500
+
+    reset
+
+commit 24917f5a6530ccd1739a6ecd33f3f21c079c4194
+Author: Megan Chen <meganchen@utexas.edu>
+Date:   Sat Sep 3 15:48:02 2016 -0500
+
+    resolves #6, putting skeleton collatz code in directory
+
+commit a92976789542255d3e9504f9acac444b7e27f2d6
+Author: Megan Chen <meganchen@utexas.edu>
+Date:   Sat Sep 3 15:28:52 2016 -0500
+
+    resolved #1 to set up travis ci on dev branch
+
+commit f983a9140c9a6bcae7b13c6e7363f794555de267
+Author: Megan Chen <meganchen@utexas.edu>
+Date:   Sat Sep 3 15:16:03 2016 -0500
+
+    Initial commit
