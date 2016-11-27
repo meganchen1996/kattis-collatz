@@ -14,27 +14,23 @@
 #include <iostream> // istream, ostream
 #include <string>   // string
 #include <utility>  // pair
-#include <map>
 #include <vector>
+#include <tuple>
 
 using namespace std;
-
-
-extern int cache[2000001];
-extern map<int, int> freq_dict; 
 
 // ------------
 // collatz_read
 // ------------
 
 /**
- * read two ints from r into i an j
+ * read two long longs from r long longo i an j
  * @param r an istream
- * @param i an int
- * @param j an int
+ * @param i an long long
+ * @param j an long long
  * @return true if the read is successful, otherwise false
  */
-bool collatz_read(istream &r, int &i, int &j);
+bool collatz_read(istream &r, long long &i, long long &j);
 
 // ------------
 // collatz_eval
@@ -45,12 +41,7 @@ bool collatz_read(istream &r, int &i, int &j);
  * @param j the end       of the range, inclusive
  * @return the max cycle length of the range [i, j]
  */
-void collatz_eval(int i, int j, ostream& w);
-
-/* different collatz eval versions */
-
-//int unoptimized_collatz_eval(int i, int j);
-//int optimized_collatz_eval(int i, int j);
+void collatz_eval(long long i, long long j, ostream& w);
 
 // ------------
 // collatz_individual_solve
@@ -60,24 +51,24 @@ void collatz_eval(int i, int j, ostream& w);
  * @param i the beginning of the range, inclusive
  * @return the cycle length of n
  */
-vector<int> collatz_solve(vector<int>&, int& meet_num, bool& has_found_meet);
+void collatz_individ_solve(vector<long long>& numbers, long long n);
 
+tuple<long long, long long, long long> get_meet(vector<long long>& i_cycles, vector<long long>& j_cycles);
 // -------------
 // collatz_print
 // -------------
 
 /**
- * print three ints to w
+ * print three long longs to w
  * @param w an ostream
  * @param i the beginning of the range, inclusive
  * @param j the end       of the range, inclusive
  * @param v the max cycle length
  */
 void collatz_print(ostream &w, 
-                  int i, 
-                  int j,
-                  vector<int> results, 
-                  int meet);
+                  long long i, 
+                  long long j,
+                  tuple<long long, long long, long long> results);
 
 // -------------
 // collatz_solve

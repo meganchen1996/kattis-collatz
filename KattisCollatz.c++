@@ -14,8 +14,8 @@
 #include <iostream> // istream, ostream
 #include <string>   // string
 #include <utility>  // pair
-
-extern int cache[2000001];
+#include <vector>
+#include <tuple>
 
 using namespace std;
 
@@ -24,13 +24,13 @@ using namespace std;
 // ------------
 
 /**
- * read two ints from r into i an j
+ * read two long longs from r long longo i an j
  * @param r an istream
- * @param i an int
- * @param j an int
+ * @param i an long long
+ * @param j an long long
  * @return true if the read is successful, otherwise false
  */
-bool collatz_read(istream &r, int &i, int &j);
+bool collatz_read(istream &r, long long &i, long long &j);
 
 // ------------
 // collatz_eval
@@ -41,12 +41,7 @@ bool collatz_read(istream &r, int &i, int &j);
  * @param j the end       of the range, inclusive
  * @return the max cycle length of the range [i, j]
  */
-int collatz_eval(int i, int j);
-
-/* different collatz eval versions */
-
-int unoptimized_collatz_eval(int i, int j);
-int optimized_collatz_eval(int i, int j);
+void collatz_eval(long long i, long long j, ostream& w);
 
 // ------------
 // collatz_individual_solve
@@ -56,20 +51,24 @@ int optimized_collatz_eval(int i, int j);
  * @param i the beginning of the range, inclusive
  * @return the cycle length of n
  */
-int collatz_individual_solve(int n);
+void collatz_individ_solve(vector<long long>& numbers, long long n);
 
+tuple<long long, long long, long long> get_meet(vector<long long>& i_cycles, vector<long long>& j_cycles);
 // -------------
 // collatz_print
 // -------------
 
 /**
- * print three ints to w
+ * print three long longs to w
  * @param w an ostream
  * @param i the beginning of the range, inclusive
  * @param j the end       of the range, inclusive
  * @param v the max cycle length
  */
-void collatz_print(ostream &w, int i, int j, int v);
+void collatz_print(ostream &w, 
+                  long long i, 
+                  long long j,
+                  tuple<long long, long long, long long> results);
 
 // -------------
 // collatz_solve
@@ -97,18 +96,13 @@ void collatz_solve(istream &r, ostream &w);
 #include <string>
 
 
-#define CACHE_SIZE 2000001
-#define CACHE_OPT
-
-int cache[2000001];
-
 using namespace std;
 
 // ------------
 // collatz_read
 // ------------
 
-bool collatz_read(istream &r, int &i, int &j) {
+bool collatz_read(istream &r, long long &i, long long &j) {
   if (!(r >> i))
     return false;
   r >> j;
@@ -119,71 +113,24 @@ bool collatz_read(istream &r, int &i, int &j) {
 // collatz_eval
 // ------------
 
-int collatz_eval(int i, int j) {
-  int lowerBound;
-  int upperBound;
-  if (i < j) {
-    lowerBound = i;
-    upperBound = j;
-  } else {
-    lowerBound = j;
-    upperBound = i;
-  }
-  int maxCycleLength;
-#ifdef CACHE_OPT
-  maxCycleLength = optimized_collatz_eval(lowerBound, upperBound);
-#else
-  int maxCycleLength = unoptimized_collatz_eval(lowerBound, upperBound);
-#endif
+void collatz_eval(long long i, long long j, ostream& w) {
+  vector<long long> i_cycles;
+  vector<long long> j_cycles;
+  collatz_individ_solve(i_cycles, i);
+  collatz_individ_solve(j_cycles, j);
+  //cout << "i cycles size: " << i_cycles.size() << endl;
+  //cout << "j cycles size: " << j_cycles.size() << endl;
+  tuple<long long, long long, long long> result = get_meet(i_cycles, j_cycles); 
 
-  return maxCycleLength;
+  collatz_print(w, i, j, result);
 }
 
-/* Optimized cache */
-int optimized_collatz_eval(int i, int j) {
-  int maxCycleLength = 0;
-  while (i <= j) {
-    int cycleLength = 0;
-
-    // checks if the value is in the cache
-    if (i < 2000001) {
-      if (cache[i] != 0) {
-        cycleLength = cache[i];
-      } else {
-        cycleLength = collatz_individual_solve(i);
-        cache[i] = cycleLength;
-      }
-
-    } else {
-      cycleLength = collatz_individual_solve(i);
-    }
-
-    if (cycleLength > maxCycleLength) {
-      maxCycleLength = cycleLength;
-    }
-    i++;
-  }
-  return maxCycleLength;
-}
-
-/* Unoptimized cache */
-int unoptimized_collatz_eval(int i, int j) {
-  int maxCycleLength = 0;
-  while (i <= j) {
-    int cycleLength = collatz_individual_solve(i);
-    if (cycleLength > maxCycleLength) {
-      maxCycleLength = cycleLength;
-    }
-    i++;
-  }
-  return maxCycleLength;
-}
 /*
-Helper method: collatz_individual_solve
+Helper method: collatz_solve
 */
 
-int collatz_individual_solve(int n) {
-  int cycleLength = 1;
+void collatz_individ_solve(vector<long long>& numbers, long long n) {
+  numbers.push_back(n);
   while (n > 1) {
     // even
     if (n % 2 == 0) {
@@ -192,25 +139,51 @@ int collatz_individual_solve(int n) {
     // odd
     else {
       n = 3 * n + 1;
-      n = n /
-          2; // small optimization: will automatically assume odd becomes even
-      cycleLength++;
+      //numbers.push_back(n);
+      //n = n / 2; // small optimization: will automatically assume odd becomes even
     }
-    cycleLength = cycleLength + 1;
-    if (cycleLength < 0) {
-      cout << cycleLength << endl;
-    }
+    numbers.push_back(n);
   }
 
-  return cycleLength;
+}
+
+//return {i steps, j steps, meet number}
+tuple<long long, long long, long long> get_meet(vector<long long>& i_cycles, vector<long long>& j_cycles) {
+  if(i_cycles.size() < j_cycles.size()) {
+    for(long long i = 0; i < i_cycles.size(); i++) {
+      for(long long j = 0; j < j_cycles.size(); j++) {
+        //cout << i_cycles[i] << " " << j_cycles[j] << endl;
+        //cout << "i steps: " << i << ", j steps: " << j << ", meeted at " << i_cycles[i] << " " << j_cycles[j] << endl;
+        if(i_cycles[i] == j_cycles[j]) {
+          return make_tuple(i, j, i_cycles[i]);
+        }
+      }
+    }
+  } else {
+    // j list is smaller
+    for(long long j = 0; j < j_cycles.size(); j++) {
+      for(long long i = 0; i < i_cycles.size(); i++) {
+        //cout << i_cycles[i] << " " << j_cycles[j] << endl;
+        //cout << "i steps: " << i << ", j steps: " << j << ", meeted at " << i_cycles[i] << " " << j_cycles[j] << endl;
+        if(j_cycles[j] == i_cycles[i]) {
+          return make_tuple(i, j, i_cycles[i]);
+        }
+      }
+    }
+  }
 }
 
 // -------------
 // collatz_print
 // -------------
 
-void collatz_print(ostream &w, int i, int j, int v) {
-  w << i << " " << j << " " << v << endl;
+void collatz_print(ostream &w, 
+                  long long i, 
+                  long long j,
+                  tuple<long long, long long, long long> results) {
+  w << i << " needs " << get<0>(results) << " steps, " 
+    << j << " needs " << get<1>(results) << " steps, they meet at " 
+    << get<2>(results) << endl;
 }
 
 // -------------
@@ -218,11 +191,11 @@ void collatz_print(ostream &w, int i, int j, int v) {
 // -------------
 
 void collatz_solve(istream &r, ostream &w) {
-  int i;
-  int j;
+  long long i;
+  long long j;
   while (collatz_read(r, i, j)) {
-    const int v = collatz_eval(i, j);
-    collatz_print(w, i, j, v);
+    if(i != 0 && j != 0)
+      collatz_eval(i, j, w);
   }
 }
 // -------------------------------

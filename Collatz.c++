@@ -14,20 +14,13 @@
 
 #include "Collatz.h"
 
-#define CACHE_SIZE 2000001
-#define CACHE_OPT
-
-int cache[2000001];
-//the number, and the cycle length when it's first seen in i sequence
-map<int, int> freq_dict;
-
 using namespace std;
 
 // ------------
 // collatz_read
 // ------------
 
-bool collatz_read(istream &r, int &i, int &j) {
+bool collatz_read(istream &r, long long &i, long long &j) {
   if (!(r >> i))
     return false;
   r >> j;
@@ -38,135 +31,77 @@ bool collatz_read(istream &r, int &i, int &j) {
 // collatz_eval
 // ------------
 
-void collatz_eval(int i, int j, ostream& w) {
-  int meet_num; 
-  bool has_found_meet = false;
-  vector<int> numbers {i, j}; 
-  // find the cycle length for i
-  // int i_cycle_length = collatz_individual_solve(i, meet_num, has_found_meet); 
-  // // find the cycle length for j
-  // int j_cycle_length = collatz_individual_solve(j, meet_num, has_found_meet);
+void collatz_eval(long long i, long long j, ostream& w) {
+  vector<long long> i_cycles;
+  vector<long long> j_cycles;
+  collatz_individ_solve(i_cycles, i);
+  collatz_individ_solve(j_cycles, j);
+  //cout << "i cycles size: " << i_cycles.size() << endl;
+  //cout << "j cycles size: " << j_cycles.size() << endl;
+  tuple<long long, long long, long long> result = get_meet(i_cycles, j_cycles); 
 
-  vector<int> results = collatz_solve(numbers, meet_num, has_found_meet);
-
-
-  results[0] = freq_dict[meet_num];
-  collatz_print(w, i, j, results, meet_num);
-
-  // reset the hash table 
-  freq_dict.clear();
-
-/*  int lowerBound;
-  int upperBound;
-  if (i < j) {
-    lowerBound = i;
-    upperBound = j;
-  } else {
-    lowerBound = j;
-    upperBound = i;
-  }
-  int maxCycleLength;
-#ifdef CACHE_OPT
-  maxCycleLength = optimized_collatz_eval(lowerBound, upperBound);
-#else
-  int maxCycleLength = unoptimized_collatz_eval(lowerBound, upperBound);
-#endif*/
+  collatz_print(w, i, j, result);
 }
 
 /*
-Helper method: collatz_individual_solve
+Helper method: collatz_solve
 */
 
-vector<int> collatz_solve(vector<int>& numbers, int& meet_num, bool& has_found_meet) {
-  vector<int> result {0, 0};
-  for(int i = 0; i < 2; i++) {
-    int cycleLength = 0;
-    int& n = numbers[i];
-    while (n != 1) {
-      //if you see this number in i's sequence & have not seen it before, 
-      //flip to be true and record it's cycle length
-      if(i == 0 && freq_dict.find(n) == freq_dict.end()) {
-        freq_dict[n] = cycleLength;
-      }
-      //if you're in j's sequence & you saw this number in i & you haven't found the meet # yet
-      if(i == 1 && freq_dict.find(n) != freq_dict.end() && !has_found_meet) {
-        has_found_meet = true;
-        meet_num = n;
-        result[1] = cycleLength;
-      }
-      // even
-      if (n % 2 == 0) {
-        n = n / 2;
-      }
-      // odd
-      else {
-        n = 3 * n + 1;
-        //n = n / 2; // small optimization: will automatically assume odd becomes even
-        //cycleLength++;
-      }
-
-
-      cycleLength++;
-      // if (cycleLength < 0) {
-      //   cout << cycleLength << endl;
-      // }
+void collatz_individ_solve(vector<long long>& numbers, long long n) {
+  numbers.push_back(n);
+  while (n > 1) {
+    // even
+    if (n % 2 == 0) {
+      n = n / 2;
     }
+    // odd
+    else {
+      n = 3 * n + 1;
+      //numbers.push_back(n);
+      //n = n / 2; // small optimization: will automatically assume odd becomes even
+    }
+    numbers.push_back(n);
   }
 
-  return result;
 }
 
-
-/* Optimized cache */
-/*int optimized_collatz_eval(int i, int j) {
-  int maxCycleLength = 0;
-  while (i <= j) {
-    int cycleLength = 0;
-
-    // checks if the value is in the cache
-    if (i < 2000001) {
-      if (cache[i] != 0) {
-        cycleLength = cache[i];
-      } else {
-        cycleLength = collatz_individual_solve(i);
-        cache[i] = cycleLength;
+//return {i steps, j steps, meet number}
+tuple<long long, long long, long long> get_meet(vector<long long>& i_cycles, vector<long long>& j_cycles) {
+  if(i_cycles.size() < j_cycles.size()) {
+    for(long long i = 0; i < i_cycles.size(); i++) {
+      for(long long j = 0; j < j_cycles.size(); j++) {
+        //cout << i_cycles[i] << " " << j_cycles[j] << endl;
+        //cout << "i steps: " << i << ", j steps: " << j << ", meeted at " << i_cycles[i] << " " << j_cycles[j] << endl;
+        if(i_cycles[i] == j_cycles[j]) {
+          return make_tuple(i, j, i_cycles[i]);
+        }
       }
-
-    } else {
-      cycleLength = collatz_individual_solve(i);
     }
-
-    if (cycleLength > maxCycleLength) {
-      maxCycleLength = cycleLength;
+  } else {
+    // j list is smaller
+    for(long long j = 0; j < j_cycles.size(); j++) {
+      for(long long i = 0; i < i_cycles.size(); i++) {
+        //cout << i_cycles[i] << " " << j_cycles[j] << endl;
+        //cout << "i steps: " << i << ", j steps: " << j << ", meeted at " << i_cycles[i] << " " << j_cycles[j] << endl;
+        if(j_cycles[j] == i_cycles[i]) {
+          return make_tuple(i, j, i_cycles[i]);
+        }
+      }
     }
-    i++;
   }
-  return maxCycleLength;
-}*/
-
-/* Unoptimized cache */
-/*int unoptimized_collatz_eval(int i, int j) {
-  int maxCycleLength = 0;
-  while (i <= j) {
-    int cycleLength = collatz_individual_solve(i);
-    if (cycleLength > maxCycleLength) {
-      maxCycleLength = cycleLength;
-    }
-    i++;
-  }
-  return maxCycleLength;
-}*/
+}
 
 // -------------
 // collatz_print
 // -------------
 
 void collatz_print(ostream &w, 
-                  int i, 
-                  int j,
-                  vector<int> results,
-                  int meet) {
-  w << i << " needs " << results[0] << " steps, " << j << " needs " << results[1] << " steps, they meet at " << meet << endl;
+                  long long i, 
+                  long long j,
+                  tuple<long long, long long, long long> results) {
+  w << i << " needs " << get<0>(results) << " steps, " 
+    << j << " needs " << get<1>(results) << " steps, they meet at " 
+    << get<2>(results) << endl;
 }
 
 // -------------
@@ -174,8 +109,8 @@ void collatz_print(ostream &w,
 // -------------
 
 void collatz_solve(istream &r, ostream &w) {
-  int i;
-  int j;
+  long long i;
+  long long j;
   while (collatz_read(r, i, j)) {
     if(i != 0 && j != 0)
       collatz_eval(i, j, w);
